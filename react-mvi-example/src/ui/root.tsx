@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { getService } from 'src/core/ioc';
 import { useObservable } from "rxjs-hooks";
 import { MovieRepository } from 'src/repositories/movie-repository';
-import { Button, Icon, Dimmer, Input, Loader, Container, Menu } from 'semantic-ui-react';
+import { Button, Icon, Form, Container, Grid } from 'semantic-ui-react';
 import { EventDispatcher } from 'src/core/event-dispatcher';
 import { MoviesRequested } from 'src/events/movies-requested';
 import { MovieList } from 'src/ui/movie-list';
 
 
-
+function handleSearch(dispatcher: EventDispatcher, searchString: string) {
+    dispatcher.dispatch(new MoviesRequested({
+        searchString
+    }));
+}
 
 export const Root: React.FC = () => {
     const movieRepository = getService(MovieRepository);
@@ -19,30 +23,32 @@ export const Root: React.FC = () => {
     const movies = useObservable(() => movieRepository.movies, []);
     return (
         <Container textAlign="justified">
-            <Menu size="huge" fluid>
-                <Input
-                    placeholder="Search..."
-                    value={searchValue} 
-                    onChange={(e, data) => setSearchValue(data.value || "")}
-                />
-                <Button 
-                    onClick={() => eventDispatcher.dispatch(new MoviesRequested({
-                        searchString: searchValue
-                    }))}
-                    disabled={loading || !searchValue}
-                    icon
-                    labelPosition="left"
-                >
-                    <Icon name="search" />
-                    Search
-                </Button>
-            </Menu>
-            <div>
-                <Dimmer active={loading} >
-                    <Loader>Loading movies...</Loader>
-                </Dimmer>
-                <MovieList movies={movies} />
-            </div>
+            <Grid size="huge" fluid>
+                <Grid.Column width={13}>
+                    <Form onSubmit={() => handleSearch(eventDispatcher, searchValue)}>
+                        <Form.Input
+                            fluid
+                            placeholder="Search..."
+                            value={searchValue} 
+                            disabled={loading}
+                            onChange={(e, data) => setSearchValue(data.value || "")}
+                            
+                        />
+                    </Form>
+                </Grid.Column>
+                <Grid.Column>
+                    <Button 
+                        onClick={() => handleSearch(eventDispatcher, searchValue)}
+                        disabled={loading || !searchValue}
+                        icon
+                        labelPosition="left"
+                    >
+                        <Icon name={loading ? "circle notch" : "search"} loading={loading} />
+                        Search
+                    </Button>
+                </Grid.Column>
+            </Grid>
+            <MovieList movies={movies} />
         </Container>
     );
 }

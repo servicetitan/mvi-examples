@@ -33,8 +33,7 @@ export const MovieRating: React.FC<MovieRatingProps> = ({
         <Segment.Inline>
             {[0,1,2,3,4].map(i => renderStar(i, rating, onSetRating))}
             {rating && 
-                <Button icon onClick={onClear} disabled={rating === "pending"}>
-                    <Icon name="dont" />
+                <Button size="mini" onClick={onClear} disabled={rating === "pending"}>
                     Clear
                 </Button>
             }
