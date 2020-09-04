@@ -1,5 +1,6 @@
 import { EventType } from 'src/core/event';
 import { RatingRequested } from 'src/events/rating-requested';
+import { RatingAccepted } from 'src/events/rating-accepted';
 import { getService } from 'src/core/ioc';
 import { RatingRepository } from 'src/repositories/rating-repository';
 import { RatingApi } from 'src/services/rating-api';
@@ -21,15 +22,14 @@ export class RatingRequestedProcessor {
 
     private async onNext(event: RatingRequested) {
         const { imdbId, rating } = event.payload;
+        this.ratingRepository.setPending(imdbId);
         try {
-            this.ratingRepository.setPending(imdbId);
             if (rating) {
                 await this.ratingApi.setRating(imdbId, rating);
-                this.ratingRepository.setRating(imdbId, rating);
             } else {
                 await this.ratingApi.removeRating(imdbId);
-                this.ratingRepository.clearRating(imdbId);
             }
+            this.dispatcher.dispatch(new RatingAccepted({ imdbId, rating }));
         } catch(err) {
             this.ratingRepository.clearPending(imdbId);
         }

@@ -16,5 +16,6 @@ export class Event<T = unknown> {
 export enum EventType {
     MoviesRequested,
     MoviesReceived,
-    RatingRequested
+    RatingRequested,
+    RatingAccepted
 }

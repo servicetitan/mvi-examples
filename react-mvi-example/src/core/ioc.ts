@@ -14,6 +14,7 @@ type Constructor<T> = Function & { prototype: T }
 
 let container: Container;
 
+// it's more of a service locator than DI, but doing proper DI is really hard in in CreateReactApp with TypeScript.
 export function getService<T>(service: Constructor<T>): T {
     return container.get<T>(service);
 }
