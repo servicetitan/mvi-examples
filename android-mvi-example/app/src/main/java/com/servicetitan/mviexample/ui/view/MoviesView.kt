@@ -35,7 +35,8 @@ class MoviesView(private val eventProcessor: MovieEventProcessor) : BaseView(eve
                     when (viewState.value) {
                         is MovieState.Loading -> Loading()
                         is MovieState.Received -> Movie()
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }
             }
