@@ -92,41 +92,18 @@ class MoviesView(private val eventProcessor: MovieEventProcessor) : BaseView<Mov
                         contentScale = ContentScale.FillWidth
                     )
 
-                    Spacer(Modifier.preferredHeight(4.dp))
+                    Spacer(Modifier.preferredHeight(8.dp))
 
                     Text(
                         modifier = Modifier.padding(start = 8.dp).gravity(Alignment.CenterHorizontally),
                         text = it.title, style = TextStyle(
                             fontFamily = FontFamily.SansSerif,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp
                         )
                     )
 
-                    Row(
-                        modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = it.year,
-                            style = TextStyle(
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                        )
-
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = it.imdbId,
-                            style = TextStyle(
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp
-                            )
-                        )
-                    }
+                    Spacer(Modifier.preferredHeight(8.dp))
                 }
             }
         }
