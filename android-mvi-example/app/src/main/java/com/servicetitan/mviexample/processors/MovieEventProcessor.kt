@@ -1,15 +1,13 @@
 package com.servicetitan.mviexample.processors
 
-import android.util.Log
-import com.servicetitan.mviexample.entities.Movie
 import com.servicetitan.mviexample.events.MovieEvent
-import com.servicetitan.mviexample.services.api.OmdbApi
 import com.servicetitan.mviexample.services.api.OmdbRetrofitApi
 import com.servicetitan.mviexample.services.db.OmdbDatabase
 import com.servicetitan.mviexample.state.MovieState
 import io.reactivex.rxkotlin.addTo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,18 +19,18 @@ class MovieEventProcessor @Inject constructor(
 
     init {
         eventDispatcher
-            .doOnError { Log.d("Movie Event Processor", "Movie Event Process Error $it") }
+            .doOnError { Timber.d("Movie Event Process Error $it") }
             .subscribe { processEvent(it) }.addTo(disposable)
     }
 
     private fun processEvent(event: MovieEvent) {
-        logEvent(event)
+        Timber.d(event.log())
         when (event) {
             is MovieEvent.Request -> {
                 GlobalScope.launch {
                     stateDispatcher.onNext(MovieState.Loading)
                     val movies = omdbDatabase.provideDatabase().movieDao()
-                        .findByQuery(event.payload.searchQuery.value)
+                        .findByQuery("%${event.payload.searchQuery.value}%")
                     if (movies.isEmpty()) {
                         eventDispatcher.onNext(MovieEvent.RequestAPI(event.payload))
                     } else {
@@ -57,6 +55,9 @@ class MovieEventProcessor @Inject constructor(
                     stateDispatcher.onNext(MovieState.Received(event.movies))
                 }
             }
+//            is MovieEvent.MovieDetails -> {
+//                stateDispatcher.onNext(MovieState.NavigateMovieDetail(event.movieid))
+//            }
         }
     }
 }

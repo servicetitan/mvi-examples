@@ -1,8 +1,8 @@
 package com.servicetitan.mviexample.ui.fragment
 
 import android.view.View
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
+import androidx.navigation.fragment.findNavController
 import com.servicetitan.mviexample.processors.MovieEventProcessor
 import com.servicetitan.mviexample.ui.view.MoviesView
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +15,7 @@ class MoviesFragment : BaseFragment<MovieEventProcessor>() {
     override fun composeView(): View =
         ComposeView(requireContext()).apply {
             view = MoviesView(eventProcessor)
-            setContent { view.MovieSearch() }
+            setContent { view.MovieSearch(findNavController()) }
         }
 
     override fun onDestroy() {

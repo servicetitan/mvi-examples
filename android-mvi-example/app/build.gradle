@@ -44,6 +44,15 @@ android {
         kotlinCompilerExtensionVersion compose_version
         kotlinCompilerVersion '1.4.0'
     }
+
+//    packagingOptions {
+//        exclude 'META-INF/ui-util_release.kotlin_module'
+//        exclude 'META-INF/ui-text-android_release.kotlin_module'
+//        exclude 'META-INF/ui-graphics_release.kotlin_module'
+//        exclude 'META-INF/ui-unit_release.kotlin_module'
+//        exclude 'META-INF/ui-geometry_release.kotlin_module'
+//        exclude 'META-INF/ui-text_release.kotlin_module'
+//    }
 }
 
 dependencies {
@@ -55,6 +64,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0-alpha07'
 
     //Navigation
+//    implementation "androidx.ui:ui-core:$compose_version_dev"
+//    implementation "androidx.ui:ui-layout:$compose_version_dev"
+//    implementation "androidx.ui:ui-material:$compose_version_dev"
     implementation "androidx.navigation:navigation-fragment-ktx:$jetpack_navigation_version"
     implementation "androidx.navigation:navigation-ui-ktx:$jetpack_navigation_version"
 
@@ -96,6 +108,9 @@ dependencies {
 
     //GSON
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
 
     //Junit
     testImplementation 'junit:junit:4.13'

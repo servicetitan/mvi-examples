@@ -15,7 +15,7 @@ data class SearchMovie(
 data class Movie(
     @SerializedName("Title") var title: String = "",
     @SerializedName("Year") var year: String = "",
-    @PrimaryKey @SerializedName("imdbId") var imdbId: String = "",
+    @PrimaryKey @SerializedName("imdbID") var imdbId: String = "",
     @SerializedName("Type") var type: String = "",
     @SerializedName("Poster") var posterUrl: String = "",
     @Ignore var favoriteRating: MutableState<Int> = mutableStateOf(0)

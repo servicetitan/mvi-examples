@@ -13,5 +13,5 @@ interface MovieDetailDao {
     suspend fun delete(item: MovieDetail): Int
 
     @Query("SELECT * FROM MovieDetail WHERE imdbId LIKE :id LIMIT 1")
-    suspend fun findById(id: String): MovieDetail
+    suspend fun findById(id: String): MovieDetail?
 }
