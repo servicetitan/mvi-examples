@@ -1,6 +1,7 @@
 package com.servicetitan.mviexample.processors
 
 import android.util.Log
+import com.servicetitan.mviexample.entities.Movie
 import com.servicetitan.mviexample.events.MovieEvent
 import com.servicetitan.mviexample.services.api.OmdbApi
 import com.servicetitan.mviexample.services.api.OmdbRetrofitApi
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 class MovieEventProcessor @Inject constructor(
     private var omdbRetrofitApi: OmdbRetrofitApi,
     private var omdbDatabase: OmdbDatabase
-): BaseProcessor<MovieEvent, MovieState>() {
+) : BaseProcessor<MovieEvent, MovieState>() {
 
     init {
         eventDispatcher
@@ -26,12 +27,13 @@ class MovieEventProcessor @Inject constructor(
 
     private fun processEvent(event: MovieEvent) {
         logEvent(event)
-        when(event) {
+        when (event) {
             is MovieEvent.Request -> {
                 GlobalScope.launch {
                     stateDispatcher.onNext(MovieState.Loading)
-                    val movies = omdbDatabase.provideDatabase().movieDao().findByQuery(event.payload.searchQuery.value)
-                    if(movies.isEmpty()) {
+                    val movies = omdbDatabase.provideDatabase().movieDao()
+                        .findByQuery(event.payload.searchQuery.value)
+                    if (movies.isEmpty()) {
                         eventDispatcher.onNext(MovieEvent.RequestAPI(event.payload))
                     } else {
                         stateDispatcher.onNext(MovieState.Received(movies))
@@ -40,8 +42,13 @@ class MovieEventProcessor @Inject constructor(
             }
             is MovieEvent.RequestAPI -> {
                 GlobalScope.launch {
-                    val movies = omdbRetrofitApi.search(event.payload.searchQuery.value)
-                    eventDispatcher.onNext(MovieEvent.SaveDB(movies))
+                    runCatching {
+                        omdbRetrofitApi.search(event.payload.searchQuery.value)
+                    }.onFailure {
+                        stateDispatcher.onNext(MovieState.Received(emptyList()))
+                    }.onSuccess {
+                        eventDispatcher.onNext(MovieEvent.SaveDB(it))
+                    }
                 }
             }
             is MovieEvent.SaveDB -> {
