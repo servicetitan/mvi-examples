@@ -20,8 +20,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.servicetitan.mviexample.entities.MovieDetail
-import com.servicetitan.mviexample.entities.Rating
+import com.example.dal.entities.MovieDetail
+import com.example.dal.entities.Rating
 import com.servicetitan.mviexample.events.MovieDetailEvent
 import com.servicetitan.mviexample.processors.MovieDetailEventProcessor
 import com.servicetitan.mviexample.state.MovieDetailState

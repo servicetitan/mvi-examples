@@ -1,4 +1,4 @@
-package com.servicetitan.mviexample.entities
+package com.example.dal.entities
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
