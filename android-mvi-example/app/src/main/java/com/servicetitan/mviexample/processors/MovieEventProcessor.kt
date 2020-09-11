@@ -4,7 +4,6 @@ import com.servicetitan.mviexample.events.MovieEvent
 import com.servicetitan.mviexample.services.api.OmdbRetrofitApi
 import com.servicetitan.mviexample.services.db.OmdbDatabase
 import com.servicetitan.mviexample.state.MovieState
-import io.reactivex.rxkotlin.addTo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -17,13 +16,7 @@ class MovieEventProcessor @Inject constructor(
     private var omdbDatabase: OmdbDatabase
 ) : BaseProcessor<MovieEvent, MovieState>() {
 
-    init {
-        eventDispatcher
-            .doOnError { Timber.d("Movie Event Process Error $it") }
-            .subscribe { processEvent(it) }.addTo(disposable)
-    }
-
-    private fun processEvent(event: MovieEvent) {
+    override fun processEvent(event: MovieEvent) {
         Timber.d(event.log())
         when (event) {
             is MovieEvent.Request -> {
