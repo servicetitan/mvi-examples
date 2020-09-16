@@ -23,9 +23,9 @@ class MovieEventProcessor @Inject constructor(
                 GlobalScope.launch {
                     stateDispatcher.onNext(MovieState.Loading)
                     val movies = omdbDatabase.provideDatabase().movieDao()
-                        .findByQuery("%${event.payload.searchQuery.value}%")
+                        .findByQuery("%${event.searchQuery}%")
                     if (movies.isEmpty()) {
-                        eventDispatcher.onNext(MovieEvent.RequestAPI(event.payload))
+                        eventDispatcher.onNext(MovieEvent.RequestAPI(event.searchQuery))
                     } else {
                         stateDispatcher.onNext(MovieState.Received(movies))
                     }
@@ -34,7 +34,7 @@ class MovieEventProcessor @Inject constructor(
             is MovieEvent.RequestAPI -> {
                 GlobalScope.launch {
                     runCatching {
-                        omdbRetrofitApi.search(event.payload.searchQuery.value)
+                        omdbRetrofitApi.search(event.searchQuery)
                     }.onFailure {
                         stateDispatcher.onNext(MovieState.Received(emptyList()))
                     }.onSuccess {
@@ -48,9 +48,6 @@ class MovieEventProcessor @Inject constructor(
                     stateDispatcher.onNext(MovieState.Received(event.movies))
                 }
             }
-//            is MovieEvent.MovieDetails -> {
-//                stateDispatcher.onNext(MovieState.NavigateMovieDetail(event.movieid))
-//            }
         }
     }
 }

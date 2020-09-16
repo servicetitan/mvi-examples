@@ -1,27 +1,38 @@
 package com.servicetitan.mviexample.ui.fragment
 
 import android.view.View
+import androidx.compose.runtime.State
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.navArgs
+import com.servicetitan.mviexample.events.MovieDetailEvent
 import com.servicetitan.mviexample.processors.MovieDetailEventProcessor
+import com.servicetitan.mviexample.state.MovieDetailState
 import com.servicetitan.mviexample.ui.view.MovieDetailView
+import com.servicetitan.mviexample.ui.view.MovieDetailViewProps
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MovieDetailFragment : BaseFragment<MovieDetailEventProcessor>() {
+class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>(null) {
 
-    val args by navArgs<MovieDetailFragmentArgs>()
+    private val args by navArgs<MovieDetailFragmentArgs>()
 
-    lateinit var view: MovieDetailView
+    private fun requestMovieDetails() = emitEvent(MovieDetailEvent.Request(args.movieId))
 
-    override fun composeView(): View =
-        ComposeView(requireContext()).apply {
-            view = MovieDetailView(eventProcessor)
-            setContent { view.MovieDetailView(args.movieId) }
+    override fun composeView(state: State<MovieDetailState?>): View {
+        requestMovieDetails()
+        return ComposeView(requireContext()).apply {
+            setContent {
+                state.value?.let {
+                    MovieDetailView(mapStateToProps(it))
+                }
+            }
         }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //view.dispose()
     }
+
+    private fun mapStateToProps(state: MovieDetailState): MovieDetailViewProps =
+        when(state) {
+            is MovieDetailState.Loading -> MovieDetailViewProps.Loading
+            is MovieDetailState.Error -> MovieDetailViewProps.Error(state.error) { requestMovieDetails() }
+            is MovieDetailState.Received -> MovieDetailViewProps.Received(state.movieDetail)
+        }
 }
