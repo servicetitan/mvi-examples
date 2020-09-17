@@ -14,19 +14,23 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ApplicationComponent::class)
 class EventModule {
 
     @Provides
+    @Singleton
     fun provideDalProvider(application: Application): STDalManager = STDal.init(application)
 
     @Provides
+    @Singleton
     fun provideMovieEventProcessor(stDalManager: STDalManager): BaseProcessor<MovieEvent, MovieState> =
         MovieEventProcessor(stDalManager)
 
     @Provides
+    @Singleton
     fun provideMovieDetailEventProcessor(stDalManager: STDalManager): BaseProcessor<MovieDetailEvent, MovieDetailState> =
         MovieDetailEventProcessor(stDalManager)
 }

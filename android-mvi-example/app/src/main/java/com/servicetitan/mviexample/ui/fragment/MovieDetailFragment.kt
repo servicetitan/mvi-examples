@@ -8,12 +8,8 @@ import com.servicetitan.mviexample.state.MovieDetailState
 import com.servicetitan.mviexample.ui.view.MovieDetailView
 import dagger.hilt.android.AndroidEntryPoint
 
-interface MovieDetailDelegate {
-    fun requestMovieDetails()
-}
-
 @AndroidEntryPoint
-class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>(), MovieDetailDelegate {
+class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>() {
 
     private val args by navArgs<MovieDetailFragmentArgs>()
 
@@ -23,10 +19,10 @@ class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>(), 
         requestMovieDetails()
         return ComposeView(requireContext()).apply {
             setContent {
-                MovieDetailView(viewState, this@MovieDetailFragment)
+                MovieDetailView(viewState) { requestMovieDetails() }
             }
         }
     }
 
-    override fun requestMovieDetails() = emitEvent(MovieDetailEvent.Request(args.movieId))
+    private fun requestMovieDetails() = emitEvent(MovieDetailEvent.Request(args.movieId))
 }

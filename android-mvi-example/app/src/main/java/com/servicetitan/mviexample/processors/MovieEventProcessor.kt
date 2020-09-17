@@ -6,9 +6,7 @@ import com.servicetitan.mviexample.state.MovieState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Singleton
 
-@Singleton
 class MovieEventProcessor(private val stDalManager: STDalManager) : BaseProcessor<MovieEvent, MovieState>() {
 
     override fun processEvent(event: MovieEvent) {

@@ -24,15 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.dal.entities.MovieDetail
 import com.example.dal.entities.Rating
-import com.servicetitan.mviexample.events.MovieDetailEvent
-import com.servicetitan.mviexample.processors.MovieDetailEventProcessor
 import com.servicetitan.mviexample.state.MovieDetailState
-import com.servicetitan.mviexample.ui.fragment.MovieDetailDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
 import com.servicetitan.mviexample.ui.theme.typography
 
 @Composable
-fun MovieDetailView(state: State<MovieDetailState> = mutableStateOf(MovieDetailState.None), delegate: MovieDetailDelegate?) {
+fun MovieDetailView(state: State<MovieDetailState> = mutableStateOf(MovieDetailState.None),
+                    onError: () -> Unit = {}
+) {
     MVIExampleTheme {
         Surface(color = MaterialTheme.colors.background) {
             Column {
@@ -44,7 +43,7 @@ fun MovieDetailView(state: State<MovieDetailState> = mutableStateOf(MovieDetailS
                         Spacer(modifier = Modifier.fillMaxWidth().height(8.dp))
                         BodyContent(movieDetail)
                     }
-                    is MovieDetailState.Error -> Error((state.value as MovieDetailState.Error).error, delegate)
+                    is MovieDetailState.Error -> Error((state.value as MovieDetailState.Error).error, onError)
                     else -> {}
                 }
             }
@@ -163,12 +162,12 @@ private fun Loading() {
 }
 
 @Composable
-private fun Error(error: String, delegate: MovieDetailDelegate?) {
+private fun Error(error: String, onError: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)) {
         Column {
             Text(text = error, style = typography.h5)
             Button(
-                onClick = { delegate?.requestMovieDetails() },
+                onClick = { onError() },
                 content = { Text(text = "Reload") }
             )
         }

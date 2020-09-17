@@ -23,17 +23,14 @@ import androidx.compose.ui.unit.sp
 import androidx.ui.tooling.preview.Preview
 import com.example.dal.entities.Movie
 import com.servicetitan.mviexample.state.MovieState
-import com.servicetitan.mviexample.ui.fragment.MoviesDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
-
-data class MovieViewInitializer(
-    val state: State<MovieState> = mutableStateOf(MovieState.None),
-    val delegate: MoviesDelegate? = null
-)
 
 @Composable
 @Preview
-fun MovieSearch(initializer: MovieViewInitializer = MovieViewInitializer()) {
+fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None),
+                searchWithQuery: (String) -> Unit = {},
+                movieSelected: (String) -> Unit = {}
+) {
     val searchQuery = remember { mutableStateOf(TextFieldValue("")) }
 
     MVIExampleTheme {
@@ -51,15 +48,15 @@ fun MovieSearch(initializer: MovieViewInitializer = MovieViewInitializer()) {
                     Spacer(Modifier.preferredWidth(12.dp))
                     Button(
                         modifier = Modifier.gravity(Alignment.CenterVertically),
-                        onClick = { initializer.delegate?.searchMovies(searchQuery.value.text)  },
+                        onClick = { searchWithQuery(searchQuery.value.text)  },
                         content = { Text(text = "Search") }
                     )
                 }
 
-                when(initializer.state.value) {
+                when(state.value) {
                     is MovieState.Loading -> Loading()
                     is MovieState.Received ->
-                        Movies(movies = (initializer.state.value as MovieState.Received).movies, initializer.delegate)
+                        Movies(movies = (state.value as MovieState.Received).movies, movieSelected)
                     else -> {}
                 }
             }
@@ -75,11 +72,11 @@ private fun Loading() {
 }
 
 @Composable
-private fun Movies(movies: List<Movie>, delegate: MoviesDelegate?) {
+private fun Movies(movies: List<Movie>, movieSelected: (String) -> Unit) {
     LazyColumnFor(items = movies) {
         Card(
             shape = MaterialTheme.shapes.medium, contentColor = Color.Black,
-            modifier = Modifier.padding(12.dp).clickable(onClick = { delegate?.navigateToMovie(it.imdbId) })
+            modifier = Modifier.padding(12.dp).clickable(onClick = { movieSelected(it.imdbId) })
         ) {
             Column(modifier = Modifier.background(Color.White)) {
                 /*

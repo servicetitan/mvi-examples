@@ -6,28 +6,22 @@ import androidx.navigation.fragment.findNavController
 import com.servicetitan.mviexample.events.MovieEvent
 import com.servicetitan.mviexample.state.MovieState
 import com.servicetitan.mviexample.ui.view.MovieSearch
-import com.servicetitan.mviexample.ui.view.MovieViewInitializer
 import dagger.hilt.android.AndroidEntryPoint
 
-interface MoviesDelegate {
-    fun searchMovies(query: String)
-    fun navigateToMovie(imdbId: String)
-}
-
 @AndroidEntryPoint
-class MoviesFragment : BaseFragment<MovieEvent, MovieState>(), MoviesDelegate {
+class MoviesFragment : BaseFragment<MovieEvent, MovieState>() {
 
     override val initialState: MovieState = MovieState.None
 
     override fun composeView(): View =
         ComposeView(requireContext()).apply {
             setContent {
-                MovieSearch(MovieViewInitializer(viewState, this@MoviesFragment))
+                MovieSearch(viewState, { searchMovies(it) }, { navigateToMovie(it) })
             }
         }
 
-    override fun searchMovies(query: String) = emitEvent(MovieEvent.Request(query))
+    private fun searchMovies(query: String) = emitEvent(MovieEvent.Request(query))
 
-    override fun navigateToMovie(imdbId: String) =
+    private fun navigateToMovie(imdbId: String) =
         findNavController().navigate(MoviesFragmentDirections.toMovieDetails(imdbId))
 }
