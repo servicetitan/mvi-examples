@@ -26,9 +26,14 @@ import com.servicetitan.mviexample.state.MovieState
 import com.servicetitan.mviexample.ui.fragment.MoviesDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
 
+data class MovieViewInitializer(
+    val state: State<MovieState> = mutableStateOf(MovieState.None),
+    val delegate: MoviesDelegate? = null
+)
+
 @Composable
 @Preview
-fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None), delegate: MoviesDelegate? = null) {
+fun MovieSearch(initializer: MovieViewInitializer = MovieViewInitializer()) {
     val searchQuery = remember { mutableStateOf(TextFieldValue("")) }
 
     MVIExampleTheme {
@@ -46,15 +51,15 @@ fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None), dele
                     Spacer(Modifier.preferredWidth(12.dp))
                     Button(
                         modifier = Modifier.gravity(Alignment.CenterVertically),
-                        onClick = { delegate?.searchMovies(searchQuery.value.text)  },
+                        onClick = { initializer.delegate?.searchMovies(searchQuery.value.text)  },
                         content = { Text(text = "Search") }
                     )
                 }
 
-                when(state.value) {
+                when(initializer.state.value) {
                     is MovieState.Loading -> Loading()
                     is MovieState.Received ->
-                        Movies(movies = (state.value as MovieState.Received).movies, delegate)
+                        Movies(movies = (initializer.state.value as MovieState.Received).movies, initializer.delegate)
                     else -> {}
                 }
             }

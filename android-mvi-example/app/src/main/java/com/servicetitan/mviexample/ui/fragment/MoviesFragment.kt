@@ -6,6 +6,7 @@ import androidx.navigation.fragment.findNavController
 import com.servicetitan.mviexample.events.MovieEvent
 import com.servicetitan.mviexample.state.MovieState
 import com.servicetitan.mviexample.ui.view.MovieSearch
+import com.servicetitan.mviexample.ui.view.MovieViewInitializer
 import dagger.hilt.android.AndroidEntryPoint
 
 interface MoviesDelegate {
@@ -21,7 +22,7 @@ class MoviesFragment : BaseFragment<MovieEvent, MovieState>(), MoviesDelegate {
     override fun composeView(): View =
         ComposeView(requireContext()).apply {
             setContent {
-                MovieSearch(viewState, this@MoviesFragment)
+                MovieSearch(MovieViewInitializer(viewState, this@MoviesFragment))
             }
         }
 
