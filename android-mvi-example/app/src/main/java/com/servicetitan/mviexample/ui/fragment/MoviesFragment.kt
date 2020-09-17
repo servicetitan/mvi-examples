@@ -16,6 +16,8 @@ interface MoviesDelegate {
 @AndroidEntryPoint
 class MoviesFragment : BaseFragment<MovieEvent, MovieState>(), MoviesDelegate {
 
+    override val initialState: MovieState = MovieState.None
+
     override fun composeView(): View =
         ComposeView(requireContext()).apply {
             setContent {

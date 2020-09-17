@@ -20,8 +20,8 @@ import javax.inject.Inject
 abstract class BaseFragment<E: BaseEvent, S: BaseState>: Fragment() {
 
     @Inject
-    lateinit var eventProcessor: BaseProcessor<@JvmSuppressWildcards E, @JvmSuppressWildcards S>
-    private val state: MutableState<S> = mutableStateOf()
+    lateinit var eventProcessor: BaseProcessor<E, S>
+    private val state: MutableState<S> = mutableStateOf(initialState)
     protected val viewState: State<S> = state
     private val disposable = CompositeDisposable()
 
@@ -41,6 +41,6 @@ abstract class BaseFragment<E: BaseEvent, S: BaseState>: Fragment() {
     }
 
     abstract fun composeView(): View
-
+    abstract val initialState: S
     protected fun emitEvent(event: E) = eventProcessor.processEvent(event)
 }

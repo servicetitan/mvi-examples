@@ -17,6 +17,8 @@ class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>(), 
 
     private val args by navArgs<MovieDetailFragmentArgs>()
 
+    override val initialState: MovieDetailState = MovieDetailState.None
+
     override fun composeView(): View {
         requestMovieDetails()
         return ComposeView(requireContext()).apply {

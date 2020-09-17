@@ -17,10 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.ui.tooling.preview.Preview
-import com.servicetitan.mviexample.entities.Movie
+import com.example.dal.entities.Movie
 import com.servicetitan.mviexample.state.MovieState
 import com.servicetitan.mviexample.ui.fragment.MoviesDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
@@ -28,7 +29,7 @@ import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
 @Composable
 @Preview
 fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None), delegate: MoviesDelegate? = null) {
-    val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf(TextFieldValue("")) }
 
     MVIExampleTheme {
         Surface(color = MaterialTheme.colors.background) {
@@ -38,15 +39,14 @@ fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None), dele
                     modifier = Modifier.padding(8.dp)
                 ) {
                     TextField(
-                        value = searchQuery,
-                        onValueChange = setSearchQuery,
-
+                        value = searchQuery.value,
+                        onValueChange = { searchQuery.value = it },
                         label = { Text("Search for movies") }
                     )
                     Spacer(Modifier.preferredWidth(12.dp))
                     Button(
                         modifier = Modifier.gravity(Alignment.CenterVertically),
-                        onClick = { delegate?.searchMovies(searchQuery)  },
+                        onClick = { delegate?.searchMovies(searchQuery.value.text)  },
                         content = { Text(text = "Search") }
                     )
                 }
