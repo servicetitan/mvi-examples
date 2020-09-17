@@ -1,6 +1,7 @@
 package com.servicetitan.mviexample.state
 
-import com.servicetitan.mviexample.entities.Movie
+import com.example.dal.entities.Movie
+
 
 sealed class MovieState: BaseState() {
     override var stateType: String = "MovieState"

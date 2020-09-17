@@ -1,7 +1,7 @@
-package com.servicetitan.mviexample.services.db
+package com.example.dal.db
 
 import androidx.room.*
-import com.servicetitan.mviexample.entities.MovieDetail
+import com.example.dal.entities.MovieDetail
 
 @Dao
 interface MovieDetailDao {
