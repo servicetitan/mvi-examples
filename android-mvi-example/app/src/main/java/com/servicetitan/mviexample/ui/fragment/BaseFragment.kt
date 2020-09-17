@@ -17,22 +17,22 @@ import io.reactivex.rxkotlin.addTo
 import timber.log.Timber
 import javax.inject.Inject
 
-abstract class BaseFragment<E: BaseEvent, S: BaseState>(initialState: S?): Fragment() {
+abstract class BaseFragment<E: BaseEvent, S: BaseState>: Fragment() {
 
     @Inject
     lateinit var eventProcessor: BaseProcessor<@JvmSuppressWildcards E, @JvmSuppressWildcards S>
-    private val state: MutableState<S?> = mutableStateOf(initialState)
+    private val state: MutableState<S> = mutableStateOf()
+    protected val viewState: State<S> = state
     private val disposable = CompositeDisposable()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        eventProcessor.stateListener
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError { Timber.d("Failed to Process State") }
-            .subscribe { state.value = it.also { Timber.d(it.log()) } }
-            .addTo(disposable)
-        return composeView(state)
-    }
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        composeView().also {
+            eventProcessor.stateListener
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError { Timber.d("Failed to Process State") }
+                .subscribe { state.value = it.also { Timber.d(it.log()) } }
+                .addTo(disposable)
+        }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -40,7 +40,7 @@ abstract class BaseFragment<E: BaseEvent, S: BaseState>(initialState: S?): Fragm
         eventProcessor.dispose()
     }
 
-    abstract fun composeView(state: State<S?>): View
+    abstract fun composeView(): View
 
     protected fun emitEvent(event: E) = eventProcessor.processEvent(event)
 }

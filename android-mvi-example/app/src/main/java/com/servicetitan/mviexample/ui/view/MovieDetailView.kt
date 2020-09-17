@@ -6,12 +6,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ColumnScope.gravity
-import androidx.compose.foundation.layout.RowScope.gravity
 import androidx.compose.foundation.lazy.LazyRowFor
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,32 +24,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.servicetitan.mviexample.entities.MovieDetail
 import com.servicetitan.mviexample.entities.Rating
-import com.servicetitan.mviexample.events.MovieDetailEvent
-import com.servicetitan.mviexample.events.MovieEvent
-import com.servicetitan.mviexample.processors.MovieDetailEventProcessor
 import com.servicetitan.mviexample.state.MovieDetailState
+import com.servicetitan.mviexample.ui.fragment.MovieDetailDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
 import com.servicetitan.mviexample.ui.theme.typography
 
-sealed class MovieDetailViewProps {
-    object Loading: MovieDetailViewProps()
-    class Error(val error: String, val onReload: () -> Unit): MovieDetailViewProps()
-    class Received(val movieDetail: MovieDetail): MovieDetailViewProps()
-}
-
 @Composable
-fun MovieDetailView(props: MovieDetailViewProps) {
+fun MovieDetailView(state: State<MovieDetailState> = mutableStateOf(MovieDetailState.None), delegate: MovieDetailDelegate?) {
     MVIExampleTheme {
         Surface(color = MaterialTheme.colors.background) {
             Column {
-                when (props) {
-                    is MovieDetailViewProps.Loading -> Loading()
-                    is MovieDetailViewProps.Received -> {
-                        HeaderContent(props.movieDetail)
+                when (state.value) {
+                    is MovieDetailState.Loading -> Loading()
+                    is MovieDetailState.Received -> {
+                        val movieDetail = (state.value as MovieDetailState.Received).movieDetail
+                        HeaderContent(movieDetail)
                         Spacer(modifier = Modifier.fillMaxWidth().height(8.dp))
-                        BodyContent(props.movieDetail)
+                        BodyContent(movieDetail)
                     }
-                    is MovieDetailViewProps.Error -> Error(props.error, props.onReload)
+                    is MovieDetailState.Error -> Error((state.value as MovieDetailState.Error).error, delegate)
+                    else -> {}
                 }
             }
         }
@@ -166,12 +161,12 @@ private fun Loading() {
 }
 
 @Composable
-private fun Error(error: String, onReload: () -> Unit) {
+private fun Error(error: String, delegate: MovieDetailDelegate?) {
     Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)) {
         Column {
             Text(text = error, style = typography.h5)
             Button(
-                onClick = onReload,
+                onClick = { delegate?.requestMovieDetails() },
                 content = { Text(text = "Reload") }
             )
         }

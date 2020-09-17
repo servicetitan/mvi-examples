@@ -1,47 +1,33 @@
 package com.servicetitan.mviexample.ui.view
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.ui.tooling.preview.Preview
 import com.servicetitan.mviexample.entities.Movie
-import com.servicetitan.mviexample.events.MovieEvent
-import com.servicetitan.mviexample.processors.MovieEventProcessor
-import com.servicetitan.mviexample.state.BaseState
 import com.servicetitan.mviexample.state.MovieState
-import com.servicetitan.mviexample.ui.fragment.MoviesFragmentDirections
+import com.servicetitan.mviexample.ui.fragment.MoviesDelegate
 import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
-import timber.log.Timber
-
-sealed class MovieSearchProps {
-    object Loading: MovieSearchProps()
-    class Received(
-        val movies: List<Movie> = emptyList(),
-        val onSearch: (searchQuery: String) -> Unit = { },
-        val onMovieClick: (imdbId: String) -> Unit = { }
-    ): MovieSearchProps()
-}
 
 @Composable
 @Preview
-fun MovieSearch(props: MovieSearchProps = MovieSearchProps.Received()) {
+fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None), delegate: MoviesDelegate? = null) {
     val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
 
     MVIExampleTheme {
@@ -60,14 +46,16 @@ fun MovieSearch(props: MovieSearchProps = MovieSearchProps.Received()) {
                     Spacer(Modifier.preferredWidth(12.dp))
                     Button(
                         modifier = Modifier.gravity(Alignment.CenterVertically),
-                        onClick = { if (props is MovieSearchProps.Received) { props.onSearch(searchQuery) } },
-                        enabled = props is MovieSearchProps.Received,
+                        onClick = { delegate?.searchMovies(searchQuery)  },
                         content = { Text(text = "Search") }
                     )
                 }
-                when (props) {
-                    is MovieSearchProps.Loading -> Loading()
-                    is MovieSearchProps.Received -> Movies(props.movies, props.onMovieClick)
+
+                when(state.value) {
+                    is MovieState.Loading -> Loading()
+                    is MovieState.Received ->
+                        Movies(movies = (state.value as MovieState.Received).movies, delegate)
+                    else -> {}
                 }
             }
         }
@@ -82,11 +70,11 @@ private fun Loading() {
 }
 
 @Composable
-private fun Movies(movies: List<Movie>, onMovieClick: (imdbId: String) -> Unit) {
+private fun Movies(movies: List<Movie>, delegate: MoviesDelegate?) {
     LazyColumnFor(items = movies) {
         Card(
             shape = MaterialTheme.shapes.medium, contentColor = Color.Black,
-            modifier = Modifier.padding(12.dp).clickable(onClick = { onMovieClick(it.imdbId) })
+            modifier = Modifier.padding(12.dp).clickable(onClick = { delegate?.navigateToMovie(it.imdbId) })
         ) {
             Column(modifier = Modifier.background(Color.White)) {
                 /*
