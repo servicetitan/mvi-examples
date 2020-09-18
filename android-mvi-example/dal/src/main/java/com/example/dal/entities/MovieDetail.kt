@@ -1,4 +1,4 @@
-package com.servicetitan.mviexample.entities
+package com.example.dal.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

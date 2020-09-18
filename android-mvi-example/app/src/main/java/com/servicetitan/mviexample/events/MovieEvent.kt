@@ -1,13 +1,12 @@
 package com.servicetitan.mviexample.events
 
-import com.servicetitan.mviexample.entities.Movie
-import com.servicetitan.mviexample.ui.view.Payload
+import com.example.dal.entities.Movie
+
 
 sealed class MovieEvent: BaseEvent() {
     override var eventType: String = "MovieEvent"
 
-    class Request(val payload: Payload) : MovieEvent()
-    class RequestAPI(val payload: Payload) : MovieEvent()
+    class Request(val searchQuery: String) : MovieEvent()
+    class RequestAPI(val searchQuery: String) : MovieEvent()
     class SaveDB(val movies: List<Movie>) : MovieEvent()
-    //class MovieDetails(val movieid: String): MovieEvent()
 }

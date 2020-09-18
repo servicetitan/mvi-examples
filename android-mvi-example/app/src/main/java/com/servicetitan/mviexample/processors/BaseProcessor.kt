@@ -1,18 +1,20 @@
 package com.servicetitan.mviexample.processors
 
+import com.servicetitan.mviexample.events.BaseEvent
+import com.servicetitan.mviexample.state.BaseState
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
 
-abstract class BaseProcessor<E, S> {
+abstract class BaseProcessor<E: BaseEvent, S: BaseState> {
 
-    val eventDispatcher = BehaviorSubject.create<E>()
+    protected val eventDispatcher = BehaviorSubject.create<E>()
     protected val stateDispatcher = BehaviorSubject.create<S>()
-    val stateListener: Observable<S> = stateDispatcher.hide()
+    private val disposable = CompositeDisposable()
 
-    protected val disposable = CompositeDisposable()
+    val stateListener: Observable<S> = stateDispatcher.hide()
 
     init {
         eventDispatcher
