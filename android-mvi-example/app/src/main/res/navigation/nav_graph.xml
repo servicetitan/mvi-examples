@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/moviesFragment">
+
+    <fragment
+        android:id="@+id/moviesFragment"
+        android:name="com.servicetitan.mviexample.ui.fragment.MoviesFragment"
+        android:label="MoviesFragment" >
+        <action
+            android:id="@+id/toMovieDetails"
+            app:destination="@id/movieDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/movieDetailFragment"
+        android:name="com.servicetitan.mviexample.ui.fragment.MovieDetailFragment"
+        android:label="MovieDetailFragment">
+        <argument
+            android:name="movieId"
+            android:defaultValue='""'
+            app:argType="string" />
+    </fragment>
+</navigation>
