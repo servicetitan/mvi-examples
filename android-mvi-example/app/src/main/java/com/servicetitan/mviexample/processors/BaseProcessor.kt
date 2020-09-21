@@ -10,21 +10,27 @@ import timber.log.Timber
 
 abstract class BaseProcessor<E: BaseEvent, S: BaseState> {
 
-    protected val eventDispatcher = BehaviorSubject.create<E>()
-    protected val stateDispatcher = BehaviorSubject.create<S>()
+    private val eventDispatcher = BehaviorSubject.create<E>()
+    private val stateDispatcher = BehaviorSubject.create<S>()
     private val disposable = CompositeDisposable()
 
-    val stateListener: Observable<S> = stateDispatcher.hide()
+    val stateSource: Observable<S> = stateDispatcher.hide()
 
     init {
         eventDispatcher
+            .doOnNext { Timber.d(it.log()) }
             .doOnError { Timber.d("Event Process Error $it") }
-            .subscribe { processEvent(it) }.addTo(disposable)
+            .subscribe { processEvent(it) }
+            .addTo(disposable)
     }
 
     fun dispose() {
         disposable.clear()
     }
 
-    abstract fun processEvent(event: E)
+    fun handleEvent(event: E) = eventDispatcher.onNext(event)
+
+    protected abstract fun processEvent(event: E)
+
+    protected fun emitState(state: S) = stateDispatcher.onNext(state)
 }

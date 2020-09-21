@@ -20,7 +20,7 @@ class MoviesFragment : BaseFragment<MovieEvent, MovieState>() {
             }
         }
 
-    private fun searchMovies(query: String) = emitEvent(MovieEvent.Request(query))
+    private fun searchMovies(query: String) = emitEvent(MovieEvent.Requested(query))
 
     private fun navigateToMovie(imdbId: String) =
         findNavController().navigate(MoviesFragmentDirections.toMovieDetails(imdbId))

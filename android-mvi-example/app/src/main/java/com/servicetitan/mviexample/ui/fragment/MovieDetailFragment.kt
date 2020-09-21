@@ -24,5 +24,5 @@ class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>() {
         }
     }
 
-    private fun requestMovieDetails() = emitEvent(MovieDetailEvent.Request(args.movieId))
+    private fun requestMovieDetails() = emitEvent(MovieDetailEvent.Requested(args.movieId))
 }

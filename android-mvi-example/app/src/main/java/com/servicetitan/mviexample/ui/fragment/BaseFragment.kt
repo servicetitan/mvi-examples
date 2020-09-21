@@ -27,7 +27,7 @@ abstract class BaseFragment<E: BaseEvent, S: BaseState>: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         composeView().also {
-            eventProcessor.stateListener
+            eventProcessor.stateSource
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError { Timber.d("Failed to Process State") }
                 .subscribe { state.value = it.also { Timber.d(it.log()) } }
@@ -42,5 +42,5 @@ abstract class BaseFragment<E: BaseEvent, S: BaseState>: Fragment() {
 
     abstract fun composeView(): View
     abstract val initialState: S
-    protected fun emitEvent(event: E) = eventProcessor.processEvent(event)
+    protected fun emitEvent(event: E) = eventProcessor.handleEvent(event)
 }
