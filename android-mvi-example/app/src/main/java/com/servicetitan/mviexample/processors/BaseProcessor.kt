@@ -2,35 +2,33 @@ package com.servicetitan.mviexample.processors
 
 import com.servicetitan.mviexample.events.BaseEvent
 import com.servicetitan.mviexample.state.BaseState
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 abstract class BaseProcessor<E: BaseEvent, S: BaseState> {
 
-    private val eventDispatcher = BehaviorSubject.create<E>()
-    private val stateDispatcher = BehaviorSubject.create<S>()
-    private val disposable = CompositeDisposable()
-
-    val stateSource: Observable<S> = stateDispatcher.hide()
+    private val eventDispatcher = ConflatedBroadcastChannel<E>()
+    private val stateDispatcher = ConflatedBroadcastChannel<S>()
+    val stateSource: Flow<S> = stateDispatcher.asFlow()
 
     init {
-        eventDispatcher
-            .doOnNext { Timber.d(it.log()) }
-            .doOnError { Timber.d("Event Process Error $it") }
-            .subscribe { processEvent(it) }
-            .addTo(disposable)
+        GlobalScope.launch { eventDispatcher.consumeEach { processEvent(it) } }
     }
 
-    fun dispose() {
-        disposable.clear()
+    fun handleEvent(event: E) {
+        GlobalScope.launch { eventDispatcher.send(event).also { Timber.d(event.log()) } }
     }
 
-    fun handleEvent(event: E) = eventDispatcher.onNext(event)
+    protected fun emitState(state: S) {
+        GlobalScope.launch { stateDispatcher.send(state).also { Timber.d(state.log()) } }
+    }
 
     protected abstract fun processEvent(event: E)
-
-    protected fun emitState(state: S) = stateDispatcher.onNext(state)
 }

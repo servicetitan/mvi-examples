@@ -1,6 +1,7 @@
 package com.servicetitan.mviexample.ui.fragment
 
 import android.view.View
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.findNavController
 import com.servicetitan.mviexample.events.MovieEvent
@@ -11,12 +12,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MoviesFragment : BaseFragment<MovieEvent, MovieState>() {
 
-    override val initialState: MovieState = MovieState.None
-
     override fun composeView(): View =
         ComposeView(requireContext()).apply {
             setContent {
-                MovieSearch(viewState, { searchMovies(it) }, { navigateToMovie(it) })
+                MovieSearch(
+                    eventProcessor.stateSource.collectAsState(initial = MovieState.None),
+                    { searchMovies(it) }) { navigateToMovie(it) }
             }
         }
 
