@@ -27,9 +27,10 @@ import com.servicetitan.mviexample.ui.theme.MVIExampleTheme
 
 @Composable
 @Preview
-fun MovieSearch(state: State<MovieState> = mutableStateOf(MovieState.None),
-                searchWithQuery: (String) -> Unit = {},
-                movieSelected: (String) -> Unit = {}
+fun MovieSearch(
+    state: State<MovieState> = mutableStateOf(MovieState.None),
+    searchWithQuery: (String) -> Unit = {},
+    movieSelected: (String) -> Unit = {}
 ) {
     val searchQuery = remember { mutableStateOf(TextFieldValue("")) }
 

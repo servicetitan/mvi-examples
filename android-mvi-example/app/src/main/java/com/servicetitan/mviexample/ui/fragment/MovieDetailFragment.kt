@@ -1,6 +1,7 @@
 package com.servicetitan.mviexample.ui.fragment
 
 import android.view.View
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.navArgs
 import com.servicetitan.mviexample.events.MovieDetailEvent
@@ -13,13 +14,12 @@ class MovieDetailFragment : BaseFragment<MovieDetailEvent, MovieDetailState>() {
 
     private val args by navArgs<MovieDetailFragmentArgs>()
 
-    override val initialState: MovieDetailState = MovieDetailState.None
-
     override fun composeView(): View {
         requestMovieDetails()
         return ComposeView(requireContext()).apply {
             setContent {
-                MovieDetailView(viewState) { requestMovieDetails() }
+                MovieDetailView(eventProcessor.stateSource
+                    .collectAsState(initial = MovieDetailState.None)) { requestMovieDetails() }
             }
         }
     }
